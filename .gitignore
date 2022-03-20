@@ -1,3 +1,4 @@
 node_modules/
 __pycache__/
 *.swp
+json_validator/target
