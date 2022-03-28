@@ -12,6 +12,8 @@ use nom::{
 use std::error::Error;
 use std::str;
 
+const NUMBER_OF_SPACES:usize = 2;
+
 #[derive(Debug, PartialEq, Eq)]
 struct Indention {
     count: usize,
@@ -112,7 +114,7 @@ pub fn check_format(i: &str) -> bool {
         //dbg!(&token);
         match token {
             Token::OpenSquare | Token::OpenCurley => {
-                if indent.count != 4 * indent_level {
+                if indent.count != NUMBER_OF_SPACES * indent_level {
                     return false;
                 }
                 indent_level += 1;
