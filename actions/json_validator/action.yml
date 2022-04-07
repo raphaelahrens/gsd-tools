@@ -1,0 +1,5 @@
+name: 'JSON Validator'
+description: 'Validate the Syntax and the format of the JSON files'
+runs:
+  using: 'docker'
+  image: 'Dockerfile'

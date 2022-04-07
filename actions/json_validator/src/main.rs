@@ -10,13 +10,15 @@ mod format_parser;
 #[derive(Debug)]
 enum Issue {
     SyntaxError,
+    EoFError,
 }
 
 fn parse_json(contents: &str) -> Result<Option<Issue>> {
     match serde_json::from_str::<serde_json::Value>(&contents) {
         Err(e) => match e.classify() {
             Category::Syntax => Ok(Some(Issue::SyntaxError)),
-            Category::Io | Category::Data | Category::Eof => Err(eyre::eyre!(e)),
+            Category::Eof => Ok(Some(Issue::EoFError)),
+            Category::Io | Category::Data => Err(eyre::eyre!(e)),
         },
         Ok(_) => Ok(None),
     }
