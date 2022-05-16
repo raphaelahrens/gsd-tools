@@ -3,16 +3,15 @@ use nom::{
     bytes::complete::tag,
     character::complete::{char, line_ending, none_of},
     combinator::{eof, map, opt, recognize, value},
-    error::{context, convert_error, ContextError, ErrorKind, ParseError, VerboseError},
+    error::ParseError,
     multi::{many0_count, many1},
     number::complete::double,
     sequence::{preceded, separated_pair, terminated, tuple},
     IResult,
 };
-use std::error::Error;
 use std::str;
 
-const NUMBER_OF_SPACES:usize = 2;
+const NUMBER_OF_SPACES:usize = 4;
 
 #[derive(Debug, PartialEq, Eq)]
 struct Indention {
@@ -102,16 +101,13 @@ fn parse(i: &str) -> IResult<&str, Vec<(Indention, Token)>> {
 
 pub fn check_format(i: &str) -> bool {
     let (_rest, lines) = match parse(&i) {
-        Err(e) => {
+        Err(_e) => {
             return false;
         }
         Ok(lines) => lines,
     };
     let mut indent_level = 0;
     for (indent, token) in lines {
-        //dbg!(&indent.count);
-        //dbg!(&indent_level);
-        //dbg!(&token);
         match token {
             Token::OpenSquare | Token::OpenCurley => {
                 if indent.count != NUMBER_OF_SPACES * indent_level {
@@ -121,12 +117,12 @@ pub fn check_format(i: &str) -> bool {
             }
             Token::CloseCurley | Token::CloseSquare => {
                 indent_level -= 1;
-                if indent.count != 4 * indent_level {
+                if indent.count != NUMBER_OF_SPACES * indent_level {
                     return false;
                 }
             }
             Token::Value => {
-                if indent.count != 4 * indent_level {
+                if indent.count != NUMBER_OF_SPACES * indent_level {
                     return false;
                 }
             }

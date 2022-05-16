@@ -1,3 +1,7 @@
 #!/usr/bin/env bash
-
+set -euo pipefail
+cd ~
+pwd
+cd "$GITHUB_WORKSPACE"
+pwd
 git diff --name-only --diff-filter=ACMRT "HEAD^" | json_validator

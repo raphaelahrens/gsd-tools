@@ -1,4 +1,5 @@
 node_modules/
 __pycache__/
 *.swp
-json_validator/target
+actions/json_validator/target
+actions/json_validator/Cargo.lock

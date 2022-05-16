@@ -1,4 +1,3 @@
-use clap::{Parser, Subcommand};
 use eyre::Result;
 use serde_json::error::Category;
 use std::ffi::OsStr;
@@ -25,31 +24,36 @@ fn parse_json(contents: &str) -> Result<Option<Issue>> {
 }
 
 fn main() -> Result<()> {
-    //let args = Args::parse();
-    let dot_json = Some(OsStr::new("json"));
+    let json_extension = Some(OsStr::new("json"));
 
-    let mut issues = 0;
+    let mut json_err = 0;
+    let mut format_err = 0;
 
+    println!("::group::errors_and_warnings");
     for line in io::stdin().lock().lines() {
         let l = line?;
         let path = Path::new(&l);
         // ignore none files and files with no '.josn' extension
-        if !path.is_file() || path.extension() != dot_json {
+        if !path.is_file() || path.extension() != json_extension {
             continue;
         }
         let contents = std::fs::read_to_string(path)?;
         if let Some(issue) = parse_json(&contents)? {
             println!("{:?} {:?}", &path, &issue);
-            issues += 1;
+            json_err += 1;
         } else if !format_parser::check_format(&contents) {
             println!("{:?} WrongFormat", &path);
-            issues += 1;
+            format_err += 1;
         }
     }
+    println!("::endgroup::");
 
-    if issues == 0 {
+    if json_err + format_err == 0 {
         Ok(())
     } else {
+        println!("Found");
+        println!("     {json_err} JSON encoding errors and");
+        println!("     {format_err} format errors.");
         std::process::exit(65)
     }
 }
